@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <th:block th:replace="admin/inc/header :: header"></th:block>
+</head>
+
+<body class="">
+<div class="wrapper ">
+    <th:block th:replace="admin/inc/menu :: menu"></th:block>
+
+    <div class="main-panel">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+            <div class="container-fluid">
+                <div class="navbar-wrapper">
+                    <a class="navbar-brand" href="#pablo">Produkty</a>
+                </div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header card-header-primary">
+                                <h4 class="card-title ">Produkty</h4>
+                                <p class="card-category">
+                                <form onsubmit="return textOnSearchInputChanged();" action="#">
+                                    <input autofocus th:value="${typedWord}" id="textSearch" type="text"
+                                           placeholder="Podaj nazwę">
+                                </form>
+                                </p>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table" id="productsData">
+                                        <thead class=" text-primary" id="productsTable">
+                                        <th>
+                                            Zaznacz
+                                        </th>
+                                        <th>
+                                            Nazwa produktu
+                                        </th>
+                                        <th>
+                                            Cena netto
+                                        </th>
+                                        <th>
+                                            Vat
+                                        </th>
+                                        <th>
+                                            <a th:href="'/admin/products/lastedit/0/' + ${sort.equals('count_up') ? 'count_down' : 'count_up'}">Ilość</a>
+                                        </th>
+                                        <th>
+                                            EAN
+                                        </th>
+                                        <th>
+                                            <a th:href="${'/admin/products/lastedit/0/' + (sort.equals('display_true') ? 'display_false' : 'display_true')}">Jest
+                                                widoczny?</a>
+                                        </th>
+                                        <th>
+                                            <a th:href="${'/admin/products/lastedit/0/group'}">Grupa</a>
+                                        </th>
+                                        <th>
+                                            G. Dostawca
+                                        </th>
+                                        <th>
+                                            Kategorie
+                                        </th>
+                                        <th>
+                                            Edytuj
+                                        </th>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="product : ${productsPage.getContent()}">
+                                            <td>
+                                                    <input type="checkbox"  th:value="${product.getId()}">
+                                            </td>
+                                            <td th:text="${product.getName()}"></td>
+                                            <td th:text="${product.getPriceNetto()}"></td>
+                                            <td th:text="${product.getVat()}"></td>
+                                            <td th:text="${product.getQuantity()}"></td>
+                                            <td th:text="${product.getEan()}"></td>
+                                            <td>
+                                                <input th:style="'background-color: ' + ${product.isDisplay() ? 'green' : 'red'}"
+                                                       th:onclick="'changeProductVisibility(' + ${product.getId()} + ', this);'"
+                                                       type="submit" th:value="${product.isDisplay() ? 'TAK' : 'NIE'}">
+                                            </td>
+                                            <td th:text="${product.getGroup()}"></td>
+                                            <td th:text="${product.getGroupWho()}"></td>
+                                            <td th:text="${product.getCategoriesSexyList()}"></td>
+                                            <td class="text-primary">
+                                                <a th:href="'/admin/product/edit/' + ${product.getId()}">Edytuj</a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <div>
+                                        <label for="group">Grupa: </label>
+                                        <select id="group">
+                                            <option value="0">Brak kategorii</option>
+                                            <option th:each="category : ${categories}" th:value="${category.getId()}"
+                                                    th:text="${category.getName()}"></option>
+                                        </select>
+
+                                        <label for="delivery">Dostawca: </label>
+                                        <select id="delivery">
+                                            <option value="0">Brak kategorii</option>
+                                            <option th:each="category : ${categories}" th:value="${category.getId()}"
+                                                    th:text="${category.getName()}"></option>
+                                        </select>
+
+                                        <button onclick="changeCategoryOfAllCheckedFields()">Zmień dla zaznaczonych</button>
+                                    </div>
+
+
+                                    <br/>
+
+                                    <a th:if="${productsPage.getTotalPages() > 1}" class="button btn-primary"
+                                       th:each="i: ${#numbers.sequence(0, productsPage.getTotalPages() - 1)}"
+                                       th:href="'/admin/products/lastedit/' + ${i} + '/' + ${sort}"
+                                       th:text="${'   ' + i + '   '}"></a>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <th:block th:replace="admin/inc/footer :: footer"></th:block>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="">
+    <th:block th:replace="user/inc/header :: header"></th:block>
+    <body>
+        <div class="menu-fixed menu__left">
+            <ul>
+                <li>
+                    <a href="/">Wybierz produkt</a>
+                </li>
+                <li>
+                    <a href="/summary">Koszyk</a>
+                </li>
+                <li>
+                    <a href="/logout">Wyloguj</a>
+                </li>
+                <li>
+                    <a href="/rodo">Rodo</a>
+                </li>
+                <li th:if="${userSession.getCustomer().isAdmin()}">
+                    <a href="/admin">Tajny panel admina</a>
+                </li>
+            </ul>
+        </div>
+
+        <div id="categories" class="menu-fixed menu__right">
+            <ul>
+                <th:block  th:replace="this :: oneMenu(${allCategories})"></th:block>
+
+                <li th:fragment="oneMenu(data)" th:each="category : ${data}"  th:class="${!category.getChildren().isEmpty() ? 'has-submenu' : ''}">
+                    <a th:href="'/search/category/' + ${category.getId()}"  th:text="${category.getName()}"></a>
+
+                    <th:block th:if="${!category.getChildren().isEmpty()}">
+                        <ul class="submenu">
+                            <th:block  th:replace="this :: oneMenu(${category.getChildren()})"></th:block>
+                        </ul>
+                    </th:block>
+                </li>
+            </ul>
+        </div>
+
+
+
+        <div class="content content-center">
+            <h1>Przetwarzanie danych</h1>
+            Informujemy, że:
+            <br/>1)	administratorem Pani/Pana danych osobowych jest Bratek z.o.o z siedzibą ul. Wyzwolenia 516, 43-300 Bielsko-Biała zwany dalej Administratorem; Administrator prowadzi operacje przetwarzania Pani/Pana danych osobowych (adres email),
+            <br/>2)	Pani/Pana dane osobowe przetwarzane będą w celu wysyłania maili transakcyjnych i nie będą udostępniane innym odbiorcom,
+            <br/>3)	podanie danych jest niezbędne do zawarcia umowy, w przypadku niepodania danych niemożliwe jest zawarcie umowy,
+            <br/>4)	posiada Pani/Pan prawo do:
+            <br/>•	żądania od Administratora dostępu do swoich danych osobowych, ich sprostowania, usunięcia lub ograniczenia przetwarzania danych osobowych,
+            <br/>•	wniesienia sprzeciwu wobec takiego przetwarzania,
+            <br/>•	przenoszenia danych,
+            <br/>•	wniesienia skargi do organu nadzorczego,
+            <br/>•	cofnięcia zgody na przetwarzanie danych osobowych.
+            <br/>5)	Pani/Pana dane osobowe nie podlegają zautomatyzowanemu podejmowaniu decyzji, w tym profilowaniu.
+
+        </div>
+
+        <div class="footer">
+            <a href="http://fivarto.pl/" target="_blank">Wykonanie fivarto.pl</a>
+        </div>
+    </body>
+</html>

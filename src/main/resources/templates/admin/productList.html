@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <th:block th:replace="admin/inc/header :: header"></th:block>
+</head>
+
+<body class="">
+<div class="wrapper ">
+    <th:block th:replace="admin/inc/menu :: menu"></th:block>
+
+    <div class="main-panel">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+            <div class="container-fluid">
+                <div class="navbar-wrapper">
+                    <a class="navbar-brand" href="#pablo">Produkty</a>
+                </div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header card-header-primary">
+                                <h4 class="card-title ">Produkty</h4>
+                                <p class="card-category">
+                                    <form onsubmit="return textOnSearchInputChanged();" action="#">
+                                        <input autofocus th:value="${typedWord}" id="textSearch" type="text" placeholder="Podaj nazwę">
+                                    </form>
+                                </p>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead class=" text-primary" id="productsTable">
+                                        <th>
+                                            Nazwa produktu
+                                        </th>
+                                        <th>
+                                            Cena netto
+                                        </th>
+                                        <th>
+                                            Vat
+                                        </th>
+                                        <th>
+                                            Ilość
+                                        </th>
+                                        <th>
+                                            EAN
+                                        </th>
+                                        <th>
+                                            Jest widoczny?
+                                        </th>
+                                        <th>
+                                            Grupa
+                                        </th>
+                                        <th>
+                                            G. Dostawca
+                                        </th>
+                                        <th>
+                                            Kategorie
+                                        </th>
+                                        <th>
+                                            Edytuj
+                                        </th>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="product : ${productsPage.getContent()}">
+                                            <td th:text="${product.getName()}"></td>
+                                            <td th:text="${product.getPriceNetto()}"></td>
+                                            <td th:text="${product.getVat()}"></td>
+                                            <td th:text="${product.getQuantity()}"></td>
+                                            <td th:text="${product.getEan()}"></td>
+                                            <td >
+                                                    <input th:style="'background-color: ' + ${product.isDisplay() ? 'green' : 'red'}" th:onclick="'changeProductVisibility(' + ${product.getId()} + ', this);'" type="submit" th:value="${product.isDisplay() ? 'TAK' : 'NIE'}">
+                                            </td>
+                                            <td th:text="${product.getGroup()}"></td>
+                                            <td th:text="${product.getGroupWho()}"></td>
+                                            <td th:text="${product.getCategoriesSexyList()}"></td>
+                                            <td class="text-primary">
+                                                <a th:href="'/admin/product/edit/' + ${product.getId()}">Edytuj</a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <a th:if="${productsPage.getTotalPages() > 1}" class="button btn-primary" th:each="i: ${#numbers.sequence(1, productsPage.getTotalPages())}" th:href="'/admin/products/' + ${i}" th:text="${' ' + i + ' '}"></a>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="card">
+                                                <div class="card-header card-header-primary">
+                                                    <h4 class="card-title ">Kategorie produktu</h4>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="table-responsive">
+                                                        <table class="table">
+                                                            <thead class=" text-primary">
+                                                            <th>
+                                                                Nazwa kategorii
+                                                            </th>
+                                                            <th>
+                                                                Wybierz
+                                                            </th>
+                                                            </thead>
+                                                            <tbody>
+                                                            <tr th:each="category : ${allCategories}">
+                                                                <td th:text="${category.getName()}"></td>
+                                                                <td class="text-primary">
+                                                                    <a class="btn btn-primary" th:href="${'/admin/products/category/' + category.getId()}">Wybierz</a>
+                                                                </td>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <th:block th:replace="admin/inc/footer :: footer"></th:block>
+    </div>
+</div>
+</body>
+</html>

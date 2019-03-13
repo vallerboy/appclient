@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="">
+    <head>
+        <th:block th:replace="user/inc/header :: header"></th:block>
+    </head>
+    <body>
+        <div class="menu-fixed menu__left">
+            <ul>
+                <li>
+                    <a href="/">Wybierz produkt</a>
+                </li>
+                <li>
+                    <a href="/summary">Koszyk</a>
+                </li>
+                <li>
+                    <a href="/rodo">Rodo</a>
+                </li>
+                <li>
+                    <a href="/logout">Wyloguj</a>
+                </li>
+                <li th:if="${order.getCustomer().isAdmin()}">
+                    <a href="/admin">Tajny panel admina</a>
+                </li>
+            </ul>
+        </div>
+        <div id="categories" class="menu-fixed menu__right">
+            &nbsp;<strong>Wybierz produkt:</strong>
+            <br/>
+            <ul>
+                <th:block  th:replace="this :: oneMenu(${allCategories})"></th:block>
+
+                <li th:fragment="oneMenu(data)" th:each="category : ${data}"  th:class="${!category.getChildren().isEmpty() ? 'has-submenu' : ''}">
+                    <a  th:id="${category.getId()}" th:href="'/search/category/' + ${category.getId()}"  th:style = "${category.getId() == activeCategoryId ? 'font-weight: bold;' : ''}" th:text="${category.getId() == activeCategoryId ? '-> ' + category.getName() : category.getName()}"></a>
+
+                    <th:block th:if="${!category.getChildren().isEmpty()}">
+                        <ul class="submenu" th:classappend = "${activeCategoryParent != null ? (category.getId() == activeCategoryParent.getId() ? 'active' : '') : ''}" >
+                            <th:block  th:replace="this :: oneMenu(${category.getChildren()})"></th:block>
+                        </ul>
+                    </th:block>
+                </li>
+            </ul>
+        </div>
+
+
+
+
+        <div class="content">
+              <div>
+                    <form class="float-left" onsubmit="return textOnSearchInputChanged();" action="#">
+                        <input th:value="${typedWord}" id="search" type="text" placeholder="Szukaj..">
+                        <input type="submit" value="Szukaj"/>
+                    </form>
+
+                <div class="float-right" style="margin-right: 30px">
+                    <a href="/summary">
+                        <img class="rounded" src="/img/cart.png"/>
+                    </a>
+                    <span id="cartCount" th:text="${'(' + order.getOrderItems().size() + ')'}">(0)</span>
+                </div>
+              </div>
+
+
+            <div class="clearfix"></div>
+
+            <span th:if="${activeCategoryName != null}">Aktualna kategoria: <b th:text="${activeCategoryName}"></b></span>
+
+
+            <table th:if = "${products != null}" style="table-layout: fixed; overflow-y: hidden;" class="table-responsive table-main max-height">
+                <thead>
+                    <tr>
+                        <th style="word-break: break-word; max-width: 20%">
+                            Nazwa
+                        </th>
+                        <th style="max-width:70px">
+                            Ilość
+                        </th>
+                        <th style="width: 7%;">
+                            Cena netto
+                        </th>
+                        <th style="width: 7%;">
+                            VAT
+                        </th>
+                        <th style="width: 7%;">
+                            Stan
+                        </th>
+                        <th style="width: 10%;">
+                            Koszyk
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="product : ${products}">
+                            <form th:onsubmit="'return sendAsyncAddProduct(' + ${product.getId()} + ', this);'">
+                            <td style="word-break: break-word; max-width: 20%">
+                                <a href="#" th:if="${!product.getDescription().isEmpty()}" data-toggle="modal" th:data-target="'#product' + ${product.getId()}" th:text="${!product.getDescription().isEmpty() ? product.getName() + '(kliknij i zobacz)' : product.getName()}"></a>
+                                <span th:if="${product.getDescription().isEmpty()}" data-toggle="modal" th:data-target="'#product' + ${product.getId()}" th:text="${!product.getDescription().isEmpty() ? product.getName() + '(kliknij i zobacz)' : product.getName()}"></span>
+                                <br/>
+                                <small th:text="${product.getEan()}"></small>
+                            </td>
+                                <td>
+                                    <input style="max-width:70px" class="number-input" min="0" th:id="${product.getId()}"  th:onchange="'sendAsyncEditedToServer(' +  ${product.getId()} + ', this);'" name="howMany" type="number" th:value="${order.getOrderProductCount(product.getId())}" >
+                                </td>
+                            <td th:text="${product.getPriceNetto()}"></td>
+                            <td th:text="${(product.getVat() * 100) + '%'}"></td>
+                            <td th:text="${product.getQuantity() > 100 ? 'Wiele' : product.getQuantity() > 50 ? 'Srednio' : product.getQuantity() > 0 ? 'Malo' : 'Mozliwy brak'}"></td>
+                            <td>
+                                <button type="submit" class="button">Dodaj</button>
+                            </td>
+                        </form>
+                    </tr>
+                </tbody>
+            </table>
+
+
+            <div style="text-align: center">
+                <h1 th:if = "${products == null}">Witaj! <br> Wybierz kategorię po prawej lub wyszukaj produkt</h1>
+            </div>
+
+
+            <th:block th:if="${page != null && products != null}">
+                <a  class="button btn-primary" th:each="i: ${#numbers.sequence(1, page.getTotalPages())}" th:href="'/' + ${i}" th:text="${' ' + i + ' '}"></a>
+            </th:block>
+        </div>
+
+
+
+
+
+
+
+        <div th:replace="user/inc/productModals :: modals"></div>
+        <div class="footer">
+            <a href="http://fivarto.pl/" target="_blank">Wykonanie fivarto.pl</a>
+        </div>
+
+    <script>
+        const id = "[[${activeCategoryId}]]";
+        document.getElementById(id).scrollIntoView({
+            behavior: 'smooth'
+        });
+
+        function sendAsyncAddProduct(productId, form) {
+
+
+            let data = document.getElementById(productId).value;
+            let request = new XMLHttpRequest();
+            request.open("GET", "http://5.135.218.27:9012/transaction/add/" + productId + "/" + data, true);
+            request.send();
+
+            request.onreadystatechange = function () {
+                if (request.readyState === XMLHttpRequest.DONE) {
+                    updateCartCount();
+                }
+            };
+
+            return false;
+        }
+
+        function updateCartCount() {
+            let request = new XMLHttpRequest();
+            request.open("GET", "http://5.135.218.27:9012/transaction/get/cart/count", true);
+            request.send();
+
+            request.onreadystatechange = function () {
+                if (request.readyState === XMLHttpRequest.DONE) {
+                    let item = document.getElementById("cartCount");
+                    item.innerHTML = "(" + request.responseText + ")";
+                }
+            };
+        }
+    </script>
+    </body>
+</html>

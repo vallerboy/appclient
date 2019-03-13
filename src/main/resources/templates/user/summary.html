@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="">
+    <th:block th:replace="user/inc/header :: header"></th:block>
+    <body>
+        <div class="menu-fixed menu__left">
+            <ul>
+                <li>
+                    <a href="/">Wybierz produkt</a>
+                </li>
+                <li>
+                    <a href="/summary">Koszyk</a>
+                </li>
+                <li>
+                    <a href="/rodo">Rodo</a>
+                </li>
+                <li>
+                    <a href="/logout">Wyloguj</a>
+                </li>
+                <li th:if="${order.getCustomer().isAdmin()}">
+                    <a href="/admin">Tajny panel admina</a>
+                </li>
+            </ul>
+        </div>
+
+        <div id="categories" class="menu-fixed menu__right">
+            <ul>
+                <th:block  th:replace="this :: oneMenu(${allCategories})"></th:block>
+
+                <li th:fragment="oneMenu(data)" th:each="category : ${data}"  th:class="${!category.getChildren().isEmpty() ? 'has-submenu' : ''}">
+                    <a th:href="'/search/category/' + ${category.getId()}"  th:text="${category.getName()}"></a>
+
+                    <th:block th:if="${!category.getChildren().isEmpty()}">
+                        <ul class="submenu">
+                            <th:block  th:replace="this :: oneMenu(${category.getChildren()})"></th:block>
+                        </ul>
+                    </th:block>
+                </li>
+            </ul>
+        </div>
+
+
+
+        <div class="content content-center">
+            <table id="summaryTable" class="table-responsive table-main">
+                <thead>
+                    <tr>
+                        <th>
+                            Nazwa
+                        </th>
+                        <th style="width: 20%;">
+                            Ilość
+                        </th>
+                        <th style="width: 7%;">
+                            Cena netto
+                        </th>
+                        <th style="width: 7%;">
+                            VAT
+                        </th>
+                        <th style="width: 7%;">
+                            Stan
+                        </th>
+                        <th style="width: 10%;">
+                            Usuń
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="orderItem : ${order.getOrderItems()}">
+                            <td th:text="${orderItem.getProduct().getName()}"></td>
+                            <td>
+                                <input class="number-input" min="0" th:onchange="'preloadSummaryData();' + 'sendAsyncEditedToServer(' +  ${orderItem.getProduct().getId()} + ', this);'" name="howMany" type="number" th:value="${orderItem.getCount()}" >
+                            </td>
+                            <td id="columnNetto" th:text="${orderItem.getProduct().getPriceNetto()}"></td>
+                            <td id="columnVat" th:text="${(orderItem.getProduct().getVat() * 100) + '%'}"></td>
+                               <td th:text="${orderItem.getProduct().getQuantity() > 100 ? 'Wiele' : orderItem.getProduct().getQuantity() > 50 ? 'Srednio' : orderItem.getProduct().getQuantity() > 0 ? 'Malo' : 'Mozliwy brak'}"></td>
+                            <td>
+                                <a th:href="'/transaction/remove/' + ${orderItem.getProduct().getId()}"  class="button">Usuń</a>
+                            </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <br/>
+            <hr/>
+            <br/>
+
+            <table class="table-main">
+                <thead>
+                <tr>
+                    <th>
+                        Suma netto
+                    </th>
+                    <th>
+                        Suma brutto
+                    </th>
+                    <th>
+                        Suma przedmiotów
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                        <td id="sumNetto">Wartość</td>
+                        <td id="sumBrutto">Wartość</td>
+                        <td id="sumAll">Wartość</td>
+                </tr>
+                </tbody>
+            </table>
+
+
+            <br/><br/>
+
+
+
+
+                <textarea class="w-100" id="info" placeholder="Podaj dodatkowe informacje na temat zamówienia: np. kolor lub rozmiar"></textarea>
+
+                <br/><br/>
+                <button onclick="showConfirmOrderDialog(document.getElementById('info').value)" class="btn left btn-primary btn-lg d-inline h-50 w-50">Złóż zamówienie</button>
+                <br/><br/>
+                <button onclick="showConfirmClearOrder()" class="btn right btn-primary btn-sm d-inline h-50 w-50">Wyczyść całe zamówienie</button>
+
+        </div>
+
+
+
+
+
+
+        <div class="footer">
+            <a href="http://fivarto.pl/" target="_blank">Wykonanie fivarto.pl</a>
+        </div>
+    </body>
+</html>

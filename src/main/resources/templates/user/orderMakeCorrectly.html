@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="">
+    <th:block th:replace="user/inc/header :: header"></th:block>
+    <body>
+        <div class="menu-fixed menu__left">
+            <ul>
+                <li>
+                    <a href="/">Tabela produktów</a>
+                </li>
+                <li>
+                    <a href="/summary">Podsumownie</a>
+                </li>
+                <li>
+                    <a href="/rodo">Rodo</a>
+                </li>
+                <li>
+                    <a href="/logout">Wyloguj</a>
+                </li>
+                <li th:if="${order.getCustomer().isAdmin()}">
+                    <a href="/admin">Tajny panel admina</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="menu-fixed menu__right">
+            <ul>
+                <th:block  th:replace="this :: oneMenu(${allCategories})"></th:block>
+
+                <li th:fragment="oneMenu(data)" th:each="category : ${data}"  th:class="${!category.getChildren().isEmpty() ? 'has-submenu' : ''}">
+                    <a th:href="'/search/category/' + ${category.getId()}"  th:text="${category.getName()}"></a>
+
+                    <th:block th:if="${!category.getChildren().isEmpty()}">
+                        <ul class="submenu">
+                            <th:block  th:replace="this :: oneMenu(${category.getChildren()})"></th:block>
+                        </ul>
+                    </th:block>
+                </li>
+            </ul>
+        </div>
+
+
+
+        <div class="content content-center">
+            <div style="text-align: center;">
+                <h1>Zamówienie złożone poprawnie.</h1>
+                <br/>
+                <h1>Dziękujemy!</h1>
+            </div>
+        </div>
+
+
+
+
+        <div class="footer">
+            <a href="http://fivarto.pl/" target="_blank">fivarto.pl</a>
+        </div>
+    </body>
+</html>
