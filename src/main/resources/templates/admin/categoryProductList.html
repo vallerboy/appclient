@@ -49,17 +49,17 @@
                                             Vat
                                         </th>
                                         <th>
-                                            <a th:href="${'/admin/products/0' + '/' + (sort != null && sort.equals('count_up') ? 'count_down' : 'count_up')}">Ilość</a>
+                                            <a th:href="${'/admin/products/category/' + categoryId + '/' + (sort != null && sort.equals('count_up') ? 'count_down' : 'count_up')}">Ilość</a>
                                         </th>
                                         <th>
                                             EAN
                                         </th>
                                         <th>
-                                            <a th:href="${'/admin/products/0' + '/' + (sort != null && sort.equals('display_true') ? 'display_false' : 'display_true')}">Jest
+                                            <a th:href="${'/admin/products/category/' + categoryId + '/' + (sort != null && sort.equals('display_true') ? 'display_false' : 'display_true')}">Jest
                                                 widoczny?</a>
                                         </th>
                                         <th>
-                                            <a th:href="${'/admin/products/0' + '/' + 'group'}">Grupa</a>
+                                            <a th:href="${'/admin/products/category/' + categoryId + '/' + 'group'}">Grupa</a>
                                         </th>
                                         <th>
                                             G. Dostawca

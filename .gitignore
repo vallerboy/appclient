@@ -24,3 +24,4 @@
 /nbdist/
 /.nb-gradle/
 /src/main/resources/messages.properties
+/src/main/resources/application.properties

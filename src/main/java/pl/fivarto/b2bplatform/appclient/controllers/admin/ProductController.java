@@ -38,8 +38,23 @@ public class ProductController {
 
     @GetMapping("/admin/products/{page}")
     public String products(@PathVariable(value = "page", required = false) int page,
+                           @PathVariable(value = "sort", required = false) String sortType,
                            Model model) {
-        model.addAttribute("productsPage", productService.findAllProductsForPage(page));
+        return "redirect:/admin/products/" + page + "/" + sortType;
+    }
+
+    @GetMapping("/admin/products/{page}/{sort}")
+    public String productsWithSort(@PathVariable(value = "page", required = false) int page,
+                                   @PathVariable(value = "sort", required = false) String sortType,
+                           Model model) {
+        if(sortType == null || sortType.isEmpty() || sortType.equals("null")){
+            sortType = "group";
+        }
+
+
+        model.addAttribute("sort", sortType);
+        model.addAttribute("page", page);
+        model.addAttribute("productsPage", productService.findAllProductsForPage(page, sortType));
         model.addAttribute("allCategories", categoryService.getAllCategories());
         return "admin/productList";
     }
@@ -56,12 +71,19 @@ public class ProductController {
         return "admin/productList";
     }
 
-    @GetMapping("/admin/products/category/{id}")
+    @GetMapping("/admin/products/category/{id}/{sort}")
     public String productsCategory(@PathVariable(value = "id", required = true) int id,
+                                   @PathVariable(value = "sort", required = false) String sortType,
                                    Model model) {
+        if(sortType == null || sortType.isEmpty() || sortType.equals("null")){
+            sortType = "group";
+        }
+
+        model.addAttribute("sort", sortType);
+        model.addAttribute("categoryId", id);
         model.addAttribute("allCategories", categoryService.getAllCategories());
-        model.addAttribute("productsPage", categoryService.getProductsInCategory(id));
-        return "admin/productList";
+        model.addAttribute("productsPage", categoryService.getProductsInCategory(id, sortType));
+        return "admin/categoryProductList";
     }
 
 

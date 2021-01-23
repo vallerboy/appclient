@@ -3,6 +3,7 @@ package pl.fivarto.b2bplatform.appclient.models.repotiories;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import pl.fivarto.b2bplatform.appclient.models.entites.ProductCategoryEntity;
@@ -21,6 +22,11 @@ public interface ProductCategoryRepository extends CrudRepository<ProductCategor
     void deleteByProductId(int productId);
 
     List<ProductCategoryEntity> findByCategory_IdOrderByProduct_NameAsc(int categoryId);
-    Page<ProductCategoryEntity> findByCategory_IdOrderByProduct_NameAsc(int categoryId, Pageable pageable);
+
+    @Query(
+            value = "select c from ProductCategoryEntity c join c.product join c.category where c.category.id = ?1",
+            countQuery = "select count(c) from ProductCategoryEntity c"
+    )
+    Page<ProductCategoryEntity> findByCategory_Id(int categoryId, Pageable pageable);
 
 }

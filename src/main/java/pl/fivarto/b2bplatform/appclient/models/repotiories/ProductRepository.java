@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends CrudRepository<ProductEntity, Integer> {
      Optional<ProductEntity> findByExternalId(int externalId);
-     Page<ProductEntity> findAllByOrderByName(Pageable pageable);
+     Page<ProductEntity> findAll(Pageable pageable);
      Page<ProductEntity> findAllByLastEditTimeIsAfterAndIsDataEditedIsFalse(Pageable pageable, LocalDateTime localDate);
      List<ProductEntity> findAllByLastEditTimeIsAfterAndQuantityLessThanEqual(LocalDateTime localDate, float quantity);
      Page<ProductEntity> findAllByNameContainsIgnoreCaseOrderByName(String text, Pageable pageable);

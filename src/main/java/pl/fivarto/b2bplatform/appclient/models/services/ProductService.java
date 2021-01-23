@@ -1,7 +1,6 @@
 package pl.fivarto.b2bplatform.appclient.models.services;
 
 
-import org.hibernate.query.criteria.internal.OrderImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -37,8 +36,41 @@ public class ProductService {
         this.categoryService = categoryService;
     }
 
-    public Page<ProductEntity> findAllProductsForPage(int page) {
-        return productRepository.findAllByOrderByName(PageRequest.of(page, maxPageSize));
+    public Page<ProductEntity> findAllProductsForPage(int page, String orderType) {
+        String descOrAsc = null;
+        String column = null;
+
+        switch (orderType){
+            case "display_true":{
+                descOrAsc = "DESC";
+                column = "isDisplay";
+                break;
+            }
+            case "display_false":{
+                descOrAsc = "ASC";
+                column = "isDisplay";
+                break;
+            }
+            case "count_up":{
+                column = "quantity";
+                descOrAsc = "ASC";
+                break;
+            }
+
+            case "count_down": {
+                column = "quantity";
+                descOrAsc = "DESC";
+                break;
+            }
+
+            case "group": {
+                column = "group";
+                descOrAsc = "DESC";
+                break;
+            }
+        }
+
+        return productRepository.findAll(PageRequest.of(page, maxPageSize,  Sort.by(Sort.Direction.fromString(descOrAsc), column)));
     }
 
     public Page<ProductEntity> findAllProductsForPageWhereLastEditIn(int page, int days, String orderType) {

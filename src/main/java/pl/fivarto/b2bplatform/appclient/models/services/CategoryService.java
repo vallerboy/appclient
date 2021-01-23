@@ -4,6 +4,7 @@ package pl.fivarto.b2bplatform.appclient.models.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.fivarto.b2bplatform.appclient.models.entites.CategoryEntity;
@@ -125,8 +126,39 @@ public class CategoryService {
     }
 
 
-    public Page<ProductEntity> getProductsInCategory(int categoryId) {
-        return productCategoryRepository.findByCategory_IdOrderByProduct_NameAsc(categoryId, PageRequest.of(0, Integer.MAX_VALUE))
+    public Page<ProductEntity> getProductsInCategory(int categoryId, String orderType) {
+        String descOrAsc = null;
+        String column = null;
+        switch (orderType){
+            case "display_true":{
+                descOrAsc = "DESC";
+                column = "product.isDisplay";
+                break;
+            }
+            case "display_false":{
+                descOrAsc = "ASC";
+                column = "product.isDisplay";
+                break;
+            }
+            case "count_up":{
+                column = "product.quantity";
+                descOrAsc = "ASC";
+                break;
+            }
+
+            case "count_down": {
+                column = "product.quantity";
+                descOrAsc = "DESC";
+                break;
+            }
+
+            case "group": {
+                column = "product.group";
+                descOrAsc = "DESC";
+                break;
+            }
+        }
+        return productCategoryRepository.findByCategory_Id(categoryId, PageRequest.of(0, Integer.MAX_VALUE,  Sort.by(Sort.Direction.fromString(descOrAsc), column)))
                 .map(ProductCategoryEntity::getProduct);
 
     }

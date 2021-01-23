@@ -28,6 +28,7 @@ public class CustomerEntity {
         this.nip = registerForm.getNip();
         this.phone = registerForm.getPhoneNumber();
         this.companyName = registerForm.getCompanyName();
+        this.registrationDate = LocalDateTime.now();
         setAccepted(isAcceptedAccount);
     }
 
